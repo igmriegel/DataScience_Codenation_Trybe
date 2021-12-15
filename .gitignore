@@ -1,4 +1,5 @@
 __pycache__
+__init__.py
 .pytest_cache
 output.xml
 stdout.txt

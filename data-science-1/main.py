@@ -14,7 +14,7 @@
 
 # ## _Setup_ geral
 
-# In[5]:
+# In[3]:
 
 
 import pandas as pd
@@ -35,7 +35,7 @@ from statsmodels.distributions.empirical_distribution import ECDF
 
 # ### _Setup_ da parte 1
 
-# In[7]:
+# In[4]:
 
 
 np.random.seed(42)
@@ -46,27 +46,17 @@ dataframe = pd.DataFrame({"normal": sct.norm.rvs(20, 4, size=10000),
 
 # ## Inicie sua análise a partir da parte 1 a partir daqui
 
-# In[28]:
+# In[5]:
 
 
 # Sua análise da parte 1 começa aqui.
 dataframe.quantile(q=0.25)['normal']
 
 
-# In[22]:
+# In[6]:
 
 
 dataframe.describe()
-
-
-# In[80]:
-
-
-def ecdf(data):
-    x = np.sort(data)
-    n = x.size
-    y = np.arange(1, n+1) / n 
-    return(x, y)
 
 
 # ## Questão 1
@@ -75,7 +65,7 @@ def ecdf(data):
 # 
 # Em outra palavras, sejam `q1_norm`, `q2_norm` e `q3_norm` os quantis da variável `normal` e `q1_binom`, `q2_binom` e `q3_binom` os quantis da variável `binom`, qual a diferença `(q1_norm - q1 binom, q2_norm - q2_binom, q3_norm - q3_binom)`?
 
-# In[30]:
+# In[9]:
 
 
 def q1():
@@ -102,19 +92,34 @@ print(q1())
 # 
 # Considere o intervalo $[\bar{x} - s, \bar{x} + s]$, onde $\bar{x}$ é a média amostral e $s$ é o desvio padrão. Qual a probabilidade nesse intervalo, calculada pela função de distribuição acumulada empírica (CDF empírica) da variável `normal`? Responda como uma único escalar arredondado para três casas decimais.
 
-# In[146]:
+# In[198]:
 
 
 def q2():
-    # Retorne aqui o resultado da questão 2.
-    mean_normal = dataframe['normal'].mean()
-    std_normal = dataframe['normal'].std()
+#  código original
+    # mean = dataframe['normal'].mean()
+    # std = dataframe['normal'].std()
+    # print(mean)
+    # print(std)
 
-    p_normal_x_minus_std = sct.norm.cdf(mean_normal - std_normal, loc=mean_normal, scale=std_normal)
-    p_normal_x_plus_std = sct.norm.cdf(mean_normal + std_normal,  loc=mean_normal, scale=std_normal)
+    # p_normal_x_minus_std = sct.norm.cdf(mean - std, loc=round(mean), scale=round(std))
+    # p_normal_x_plus_std = sct.norm.cdf(mean + std,  loc=round(mean), scale=round(std))
 
 
-    return np.round_(p_normal_x_plus_std - p_normal_x_minus_std, 3)
+    # # Retorne aqui o resultado da questão 2.
+    # return np.round_(p_normal_x_plus_std - p_normal_x_minus_std, 3)
+
+#  código produzido pelo Lucca na mentoria
+    mean = dataframe['normal'].mean()
+    std = dataframe['normal'].std()
+    lower_interval = mean - std
+    upper_interval = mean + std
+    emp_cdf = ECDF(dataframe['normal'])
+    lower_cdf = emp_cdf(lower_interval)
+    upper_cdf = emp_cdf(upper_interval)
+
+    return round(upper_cdf - lower_cdf, 3)
+
 
 print(q2())
 
@@ -130,16 +135,16 @@ print(q2())
 # 
 # Em outras palavras, sejam `m_binom` e `v_binom` a média e a variância da variável `binomial`, e `m_norm` e `v_norm` a média e a variância da variável `normal`. Quais as diferenças `(m_binom - m_norm, v_binom - v_norm)`?
 
-# In[147]:
+# In[10]:
 
 
 def q3():
-    # Retorne aqui o resultado da questão 3.
     m_binom = dataframe["binomial"].mean()
     v_binom = dataframe["binomial"].var()
     m_norm = dataframe["normal"].mean()
     v_norm = dataframe["normal"].var()
 
+    # Retorne aqui o resultado da questão 3.
     return ( round(m_binom - m_norm, 3), round(v_binom - v_norm, 3) )
 
 print(q3())
@@ -154,7 +159,7 @@ print(q3())
 
 # ### _Setup_ da parte 2
 
-# In[32]:
+# In[14]:
 
 
 stars = pd.read_csv("pulsar_stars.csv")
@@ -169,18 +174,24 @@ stars.rename({old_name: new_name
 stars.loc[:, "target"] = stars.target.astype(bool)
 
 
-# In[33]:
+# In[49]:
 
 
-stars.head()
+stars.shape
 
 
 # ## Inicie sua análise da parte 2 a partir daqui
 
-# In[9]:
+# In[182]:
 
 
 # Sua análise da parte 2 começa aqui.
+stars_target_false = stars[stars.target.eq(False)]
+
+mean_profile_target_false = stars_target_false[["mean_profile"]]
+
+
+mean_profile_target_false.describe()
 
 
 # ## Questão 4
@@ -196,12 +207,30 @@ stars.head()
 # 
 # Quais as probabilidade associadas a esses quantis utilizando a CDF empírica da variável `false_pulsar_mean_profile_standardized`? Responda como uma tupla de três elementos arredondados para três casas decimais.
 
-# In[10]:
+# In[185]:
 
 
 def q4():
-    # Retorne aqui o resultado da questão 4.
-    pass
+    mean = mean_profile_target_false["mean_profile"].mean()
+    std = mean_profile_target_false["mean_profile"].std()
+
+    mean_profile_target_false["standard"] = (mean_profile_target_false["mean_profile"] - mean ) / (std)
+
+    # media e desvio padrão da variavel mean_profile normalizada
+    stand_mean = mean_profile_target_false['standard'].mean()
+    stand_std = mean_profile_target_false['standard'].std()
+
+    # quantis teoricos de 0.8, 0.90 e 0.95
+    q80 = sct.norm.ppf(0.80, loc=0, scale=1)
+    q90 = sct.norm.ppf(0.90, loc=0, scale=1)
+    q95 = sct.norm.ppf(0.95, loc=0, scale=1)
+    # calculando a probabilidade com a função cdf para os quantis teoricos
+    p_q80 = sct.norm.cdf(q80,  loc=stand_mean, scale=stand_std)
+    p_q90 = sct.norm.cdf(q90,  loc=stand_mean, scale=stand_std)
+    p_q95 = sct.norm.cdf(q95,  loc=stand_mean, scale=stand_std)
+    return (p_q80, p_q90, p_q95)
+
+print(q4())
 
 
 # Para refletir:

@@ -59,6 +59,16 @@ dataframe.quantile(q=0.25)['normal']
 dataframe.describe()
 
 
+# In[80]:
+
+
+def ecdf(data):
+    x = np.sort(data)
+    n = x.size
+    y = np.arange(1, n+1) / n 
+    return(x, y)
+
+
 # ## Questão 1
 # 
 # Qual a diferença entre os quartis (Q1, Q2 e Q3) das variáveis `normal` e `binomial` de `dataframe`? Responda como uma tupla de três elementos arredondados para três casas decimais.
@@ -92,18 +102,19 @@ print(q1())
 # 
 # Considere o intervalo $[\bar{x} - s, \bar{x} + s]$, onde $\bar{x}$ é a média amostral e $s$ é o desvio padrão. Qual a probabilidade nesse intervalo, calculada pela função de distribuição acumulada empírica (CDF empírica) da variável `normal`? Responda como uma único escalar arredondado para três casas decimais.
 
-# In[38]:
+# In[146]:
 
 
 def q2():
     # Retorne aqui o resultado da questão 2.
     mean_normal = dataframe['normal'].mean()
-    std_normal =  dataframe['normal'].std()
-    
+    std_normal = dataframe['normal'].std()
+
     p_normal_x_minus_std = sct.norm.cdf(mean_normal - std_normal, loc=mean_normal, scale=std_normal)
     p_normal_x_plus_std = sct.norm.cdf(mean_normal + std_normal,  loc=mean_normal, scale=std_normal)
-    
-    return round(p_normal_x_plus_std - p_normal_x_minus_std, )
+
+
+    return np.round_(p_normal_x_plus_std - p_normal_x_minus_std, 3)
 
 print(q2())
 
@@ -119,12 +130,19 @@ print(q2())
 # 
 # Em outras palavras, sejam `m_binom` e `v_binom` a média e a variância da variável `binomial`, e `m_norm` e `v_norm` a média e a variância da variável `normal`. Quais as diferenças `(m_binom - m_norm, v_binom - v_norm)`?
 
-# In[7]:
+# In[147]:
 
 
 def q3():
     # Retorne aqui o resultado da questão 3.
-    pass
+    m_binom = dataframe["binomial"].mean()
+    v_binom = dataframe["binomial"].var()
+    m_norm = dataframe["normal"].mean()
+    v_norm = dataframe["normal"].var()
+
+    return ( round(m_binom - m_norm, 3), round(v_binom - v_norm, 3) )
+
+print(q3())
 
 
 # Para refletir:

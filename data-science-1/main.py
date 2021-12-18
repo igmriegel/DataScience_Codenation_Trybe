@@ -207,27 +207,26 @@ mean_profile_target_false.describe()
 # 
 # Quais as probabilidade associadas a esses quantis utilizando a CDF empírica da variável `false_pulsar_mean_profile_standardized`? Responda como uma tupla de três elementos arredondados para três casas decimais.
 
-# In[185]:
+# In[200]:
 
 
 def q4():
     mean = mean_profile_target_false["mean_profile"].mean()
     std = mean_profile_target_false["mean_profile"].std()
-
+    # calcular Z-index
     mean_profile_target_false["standard"] = (mean_profile_target_false["mean_profile"] - mean ) / (std)
-
-    # media e desvio padrão da variavel mean_profile normalizada
-    stand_mean = mean_profile_target_false['standard'].mean()
-    stand_std = mean_profile_target_false['standard'].std()
 
     # quantis teoricos de 0.8, 0.90 e 0.95
     q80 = sct.norm.ppf(0.80, loc=0, scale=1)
     q90 = sct.norm.ppf(0.90, loc=0, scale=1)
     q95 = sct.norm.ppf(0.95, loc=0, scale=1)
-    # calculando a probabilidade com a função cdf para os quantis teoricos
-    p_q80 = sct.norm.cdf(q80,  loc=stand_mean, scale=stand_std)
-    p_q90 = sct.norm.cdf(q90,  loc=stand_mean, scale=stand_std)
-    p_q95 = sct.norm.cdf(q95,  loc=stand_mean, scale=stand_std)
+
+    # computada a ECDF para o os valores padronizados
+    emp_cdf = ECDF(mean_profile_target_false['standard'])
+
+    p_q80 = round(emp_cdf(q80), 3)
+    p_q90 = round(emp_cdf(q90), 3)
+    p_q95 = round(emp_cdf(q95), 3)
     return (p_q80, p_q90, p_q95)
 
 print(q4())
@@ -242,12 +241,33 @@ print(q4())
 # 
 # Qual a diferença entre os quantis Q1, Q2 e Q3 de `false_pulsar_mean_profile_standardized` e os mesmos quantis teóricos de uma distribuição normal de média 0 e variância 1? Responda como uma tupla de três elementos arredondados para três casas decimais.
 
-# In[11]:
+# In[204]:
 
 
 def q5():
+    mean = mean_profile_target_false["mean_profile"].mean()
+    std = mean_profile_target_false["mean_profile"].std()
+    # calcular Z-index
+    mean_profile_target_false["standard"] = (mean_profile_target_false["mean_profile"] - mean ) / (std)
+
+    q1_standard = mean_profile_target_false.quantile(q=0.25)["standard"]
+    q2_standard = mean_profile_target_false.quantile(q=0.5)["standard"]
+    q3_standard = mean_profile_target_false.quantile(q=0.75)["standard"]
+
+    # quantis teoricos de 0.8, 0.90 e 0.95
+    q1_theoretical = sct.norm.ppf(0.25, loc=0, scale=1)
+    q2_theoretical = sct.norm.ppf(0.5, loc=0, scale=1)
+    q3_theoretical = sct.norm.ppf(0.75, loc=0, scale=1)
+
+    diff_q1 = round(q1_standard - q1_theoretical ,3)
+    diff_q2 = round(q2_standard - q2_theoretical ,3)
+    diff_q3 = round(q3_standard - q3_theoretical ,3)
+
+
     # Retorne aqui o resultado da questão 5.
-    pass
+    return (diff_q1, diff_q2, diff_q3)
+
+print(q5())
 
 
 # Para refletir:

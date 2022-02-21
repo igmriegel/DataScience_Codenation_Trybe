@@ -11,14 +11,14 @@
 
 # ## _Set up_ da análise
 
-# In[1]:
+# In[2]:
 
 
 import pandas as pd
 import numpy as np
 
 
-# In[2]:
+# In[3]:
 
 
 black_friday = pd.read_csv("black_friday.csv")
@@ -28,31 +28,31 @@ black_friday = pd.read_csv("black_friday.csv")
 
 # Analise que gera a resposta da questão 2 abaixo:
 
-# In[42]:
+# In[4]:
 
 
 black_friday[["Gender", "Age"]].groupby(["Gender", "Age"])["Age"].count()
 
 
-# In[146]:
+# In[5]:
 
 
 black_friday.isnull().describe()
 
 
-# In[104]:
+# In[6]:
 
 
 black_friday["Product_Category_3"].describe()
 
 
-# In[121]:
+# In[7]:
 
 
 black_friday["Product_Category_3"].mode()
 
 
-# In[131]:
+# In[8]:
 
 
 """
@@ -78,7 +78,7 @@ purchases_normalized.describe()
 # 
 # Quantas observações e quantas colunas há no dataset? Responda no formato de uma tuple `(n_observacoes, n_colunas)`.
 
-# In[137]:
+# In[9]:
 
 
 def q1():
@@ -95,7 +95,7 @@ q1()
 # 
 # Há quantas mulheres com idade entre 26 e 35 anos no dataset? Responda como um único escalar.
 
-# In[5]:
+# In[10]:
 
 
 def q2():
@@ -107,7 +107,7 @@ def q2():
 # 
 # Quantos usuários únicos há no dataset? Responda como um único escalar.
 
-# In[6]:
+# In[11]:
 
 
 def q3():
@@ -119,7 +119,7 @@ def q3():
 # 
 # Quantos tipos de dados diferentes existem no dataset? Responda como um único escalar.
 
-# In[139]:
+# In[12]:
 
 
 def q4():
@@ -133,7 +133,7 @@ q4()
 # 
 # Qual porcentagem dos registros possui ao menos um valor null (`None`, `ǸaN` etc)? Responda como um único escalar entre 0 e 1.
 
-# In[147]:
+# In[13]:
 
 
 def q5():
@@ -147,7 +147,7 @@ q5()
 # 
 # Quantos valores null existem na variável (coluna) com o maior número de null? Responda como um único escalar.
 
-# In[9]:
+# In[14]:
 
 
 def q6():
@@ -160,7 +160,7 @@ def q6():
 # 
 # Qual o valor mais frequente (sem contar nulls) em `Product_Category_3`? Responda como um único escalar.
 
-# In[10]:
+# In[15]:
 
 
 def q7():
@@ -172,12 +172,12 @@ def q7():
 # 
 # Qual a nova média da variável (coluna) `Purchase` após sua normalização? Responda como um único escalar.
 
-# In[149]:
+# In[16]:
 
 
 def q8():
     # Retorne aqui o resultado da questão 8.
-    return purchases_normalized.mean()[0]
+    return float(purchases_normalized.mean()[0])
 
 q8()
 
@@ -186,19 +186,31 @@ q8()
 # 
 # Quantas ocorrências entre -1 e 1 inclusive existem da variáel `Purchase` após sua padronização? Responda como um único escalar.
 
-# In[12]:
+# In[20]:
+
+
+purchases_normalized.describe()
+
+
+# In[22]:
 
 
 def q9():
-    # Retorne aqui o resultado da questão 9.
-    pass
+    v_all = purchases_normalized['purchases_normalized']
+    v_mean = purchases_normalized['purchases_normalized'].mean()
+    v_std = purchases_normalized['purchases_normalized'].std()
+    standardized = (v_all - v_mean) / v_std
+    n_val_in_interval = standardized.apply(lambda x :True if (1 >= x >= -1) else False).sum()
+    return int(n_val_in_interval)
+
+q9()
 
 
 # ## Questão 10
 # 
 # Podemos afirmar que se uma observação é null em `Product_Category_2` ela também o é em `Product_Category_3`? Responda com um bool (`True`, `False`).
 
-# In[142]:
+# In[19]:
 
 
 def q10():
